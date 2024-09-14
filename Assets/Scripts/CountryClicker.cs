@@ -39,6 +39,41 @@ public class CountryClicker : MonoBehaviour
         earthRenderer.material.SetFloat("_Choice", 0.0f);
     }
 
+    public void SetMode(int index)
+    {
+        currentMode = (Mode)(index);
+        switch(currentMode)
+        {
+            case Mode.Visual:
+                {
+                    lightingSettings.SetLighting(true);
+                    earthRenderer.material.SetFloat("_DataStrength", 0.0f);
+                    earthRenderer.material.SetFloat("_DataSaturation", 1.0f);
+                    earthRenderer.material.SetFloat("_CloudsOpacity", 0.5f);
+                    earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
+                }
+                break;
+            case Mode.Data:
+                {
+                    lightingSettings.SetLighting(false);
+                    earthRenderer.material.SetFloat("_DataStrength", 1.0f);
+                    earthRenderer.material.SetFloat("_DataSaturation", 0.0f);
+                    earthRenderer.material.SetFloat("_CloudsOpacity", 0.0f);
+                    earthRenderer.material.SetFloat("_LightsStrength", 0.0f);
+                }
+                break;
+            case Mode.Game:
+                {
+                    lightingSettings.SetLighting(false);
+                    earthRenderer.material.SetFloat("_DataStrength", 1.0f);
+                    earthRenderer.material.SetFloat("_DataSaturation", 0.0f);
+                    earthRenderer.material.SetFloat("_CloudsOpacity", 0.0f);
+                    earthRenderer.material.SetFloat("_LightsStrength", 0.0f);
+                }
+                break;
+        }
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.D) == true)
