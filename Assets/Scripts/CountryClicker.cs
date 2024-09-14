@@ -101,7 +101,7 @@ public class CountryClicker : MonoBehaviour
         else
         {
 
-            dataUIManager.RegionSelected(index, countries[index].name);
+            dataUIManager.RegionSelected(index-1, countries[index-1].name);
         }
     }
 
@@ -156,31 +156,59 @@ public class CountryClicker : MonoBehaviour
                     int pointX = (int)((longitude / (2.0f * Mathf.PI)) * width);
                     int pointY = (int)((latitude / (Mathf.PI)) * height);
                     float redValue = texturePixels[pointY * width + pointX].r;
-                    if (redValue > 0.0f)
+                    if (dataUIManager.guessObject.activeSelf == false)
                     {
-                        float val = 255.0f * redValue - 1.0f;
+                        if (redValue > 0.0f)
+                        {
+                            float val = 255.0f * redValue - 1.0f;
 
-                        int countryIndex = (int)val;
-                        currentChosenCountry = countryIndex;
+                            int countryIndex = (int)val;
+                            currentChosenCountry = countryIndex;
 
+                        }
+                        else
+                        {
+
+                            currentChosenCountry = -1;
+                        }
+
+                        dataGatherer.FillDataAtClickedPoint(pointX, pointY);
+                        earthRenderer.material.SetFloat("_CountryIndex", redValue);
+
+                        if (currentChosenCountry == -1)
+                        {
+
+                            dataUIManager.RegionSelected(-1, "");
+                        }
+                        else
+                        {
+                            dataUIManager.RegionSelected(currentChosenCountry, countries[currentChosenCountry].name);
+                        }
                     }
                     else
                     {
 
-                        currentChosenCountry = -1;
-                    }
+                        if (redValue > 0.0f)
+                        {
+                            float val = 255.0f * redValue - 1.0f;
 
-                    dataGatherer.FillDataAtClickedPoint(pointX, pointY);
-                    earthRenderer.material.SetFloat("_CountryIndex", redValue);
+                            int countryIndex = (int)val;
+                            currentChosenCountry = countryIndex;
 
-                    if (currentChosenCountry == -1)
-                    {
+                        }
+                        else
+                        {
 
-                        dataUIManager.RegionSelected(-1, "");
-                    }
-                    else
-                    {
-                        dataUIManager.RegionSelected(currentChosenCountry+1, countries[currentChosenCountry+1].name);
+                            currentChosenCountry = -1;
+                        }
+                        if (dataUIManager.guessRegionSelected == currentChosenCountry)
+                        {
+
+                            dataGatherer.FillDataAtClickedPoint(pointX, pointY);
+                            earthRenderer.material.SetFloat("_CountryIndex", redValue);
+
+                            dataUIManager.RegionSelected(currentChosenCountry, countries[currentChosenCountry].name);
+                        }
                     }
 
                 }

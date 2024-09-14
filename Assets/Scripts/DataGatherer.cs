@@ -49,6 +49,13 @@ public class DataGatherer : MonoBehaviour
     private int valueHeight;
     private float countryToValueWidth;
     private float countryToValueHeight;
+
+    private int currentValueX;
+    private int currentValueY;
+    private int clickedValueX;
+    private int clickedValueY;
+    private DataUIManager dataUIManager;
+
     [SerializeField]
     public List<int>[] countryTextureValueIndices;
     [SerializeField]
@@ -65,9 +72,16 @@ public class DataGatherer : MonoBehaviour
         valueWidth = oldNormArrays[0].width;
         countryToValueWidth = (float)oldNormArrays[0].width / (float)width;
         countryToValueHeight = (float)oldNormArrays[0].height / (float)height;
+        dataUIManager = FindObjectOfType<DataUIManager>(true);
         GatherData();
     }
 
+    public float GetCurrentClickedDistance()
+    {
+        float diffX = currentValueX - clickedValueX * countryToValueWidth;
+        float diffY = currentValueY - clickedValueY * countryToValueWidth;
+        return Mathf.Sqrt(diffX * diffX + diffY * diffY);
+    }
 
     public float[] GetClickedValues(int dataType, DataUIManager.DataMode dataMode)
     {
@@ -95,12 +109,63 @@ public class DataGatherer : MonoBehaviour
         }
         return null;
     }
-
-    public void FillDataAtPoint(int countryTextureX, int countryTextureY)
+    public float[] GetCurrentValues(int dataType, DataUIManager.DataMode dataMode)
     {
-        float valueX = (float)countryTextureX * countryToValueWidth;
-        float valueY = (float)countryTextureY * countryToValueHeight;
-        int valueIndex = (int)valueY * valueWidth + (int)valueX;
+        if (currentOldValues == null)
+        {
+            return null;
+        }
+        switch (dataMode)
+        {
+            case DataUIManager.DataMode.OldNorm:
+                {
+                    return currentOldValues[dataType];
+                }
+                break;
+            case DataUIManager.DataMode.NewNorm:
+                {
+                    return currentNewValues[dataType];
+                }
+                break;
+            case DataUIManager.DataMode.NormDifference:
+                {
+                    return currentComparisonValues[dataType];
+                }
+                break;
+        }
+        return null;
+    }
+    public void ChoosePointInCountry()
+    {
+        int countryChoice = Random.Range(0, 5*countries.Length);
+        int countryIndex = 0;
+        while(countryChoice > 0)
+        {
+            if (countryTextureValueIndices[countryIndex].Count > 50)
+            {
+                --countryChoice;
+                if(countryChoice == 0)
+                {
+                    break;
+                }
+            }
+            countryIndex = (countryIndex + 1) % countries.Length;
+        }
+        int pointIndex = Random.Range(0, countryTextureValueIndices[countryIndex].Count);
+        int countryValueIndex = countryTextureValueIndices[countryIndex][pointIndex];
+        FillDataAtPoint(countryValueIndex % valueWidth, countryValueIndex / valueWidth);
+        if(dataUIManager == null)
+        {
+            dataUIManager = FindObjectOfType<DataUIManager>(true);
+        }
+        dataUIManager.GuessRegionSelected(countryIndex, countries[countryIndex].name);
+    }
+
+    public void FillDataAtPoint(int countryValueX, int countryValueY)
+    {
+        currentValueX = (int)countryValueX;
+        currentValueY = (int)countryValueY;
+        int valueIndex = (int)countryValueY * valueWidth + (int)countryValueX;
         currentOldValues = new float[11][];
         currentNewValues = new float[11][];
         currentComparisonValues = new float[11][];
@@ -122,6 +187,8 @@ public class DataGatherer : MonoBehaviour
     {
         float valueX = (float)countryTextureX * countryToValueWidth;
         float valueY = (float)countryTextureY * countryToValueHeight;
+        clickedValueX = (int)countryTextureX;
+        clickedValueY = (int)countryTextureY;
         int valueIndex = (int)valueY*valueWidth + (int)valueX;
 
         clickedOldValues = new float[11][];
