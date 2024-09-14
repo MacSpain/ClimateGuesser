@@ -355,6 +355,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                 for (int i = 0; i < (widthResolution) * (heightResolution); ++i)
                 {
                     dataNorm[monthIndex * widthResolution * heightResolution + i] = 0;
+                    otherDataNorm[monthIndex * widthResolution * heightResolution + i] = 0;
                 }
             }
             double div = 1.0f / 30.0f;
@@ -432,13 +433,13 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
 
                             float t;
                             t = (float)((newValue - minOverallVal) / (maxOverallVal - minOverallVal));
-                            if (compValue < lowestOverallValue)
+                            if (newValue < lowestOverallValue)
                             {
-                                lowestOverallValue = compValue;
+                                lowestOverallValue = newValue;
                             }
-                            if (compValue > highestOverallValue)
+                            if (newValue > highestOverallValue)
                             {
-                                highestOverallValue = compValue;
+                                highestOverallValue = newValue;
                             }
                             t = Mathf.Clamp01(t);
                             otherotherData[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
@@ -486,10 +487,6 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                     Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
                     filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/normNew.jpg");
                     File.WriteAllBytes(filePath, bytesJPG);
-                }
-                else
-                {
-
                 }
 
             }
