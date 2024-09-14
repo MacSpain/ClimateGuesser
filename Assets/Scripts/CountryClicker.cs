@@ -64,21 +64,13 @@ public class CountryClicker : MonoBehaviour
         {
             earthRenderer.material.SetFloat("_Choice", 2.0f);
         }
-        if (Input.GetKeyDown(KeyCode.Alpha1) == true)
+        if (Input.GetKeyDown(KeyCode.LeftArrow) == true)
         {
-            reader.SetIndex(0);
+            reader.SetIndexLower();
         }
-        if (Input.GetKeyDown(KeyCode.Alpha2) == true)
+        if (Input.GetKeyDown(KeyCode.RightArrow) == true)
         {
-            reader.SetIndex(1);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3) == true)
-        {
-            reader.SetIndex(2);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4) == true)
-        {
-            reader.SetIndex(3);
+            reader.SetIndexHigher();
         }
         if (dataMode == true)
         {

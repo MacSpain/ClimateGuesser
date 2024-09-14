@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 
 [CustomEditor(typeof(ReadMeanTemperatureFiles))]
@@ -15,6 +16,11 @@ public class ReadMeanTemperatureFilesEditor : Editor
         if (GUILayout.Button("Read Files"))
         {
             myTarget.ReadFiles();
+        }
+        if (GUILayout.Button("Read FilesNorm"))
+        {
+            myTarget.ReadFilesNorm();
+            EditorUtility.SetDirty(myTarget);
         }
         if (GUILayout.Button("Create Gradients"))
         {
@@ -55,6 +61,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     public struct TextureArraysArray
     {
         public Texture2DArray oldDataTextureArray;
+        public Texture2DArray compDataTextureArray;
         public Texture2DArray newDataTextureArray;
     }
 
@@ -67,6 +74,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     public Texture2D[] gradientTextures;
     public Texture2D[] comparisonGradientTextures;
     public DataParams[] dataParams;
+    public DataParams[] normDataParams;
 
     private double[][] fileData;
     private Texture2D texture;
@@ -74,6 +82,9 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     private int latitudeCount;
     private int timeCount;
     private float[] data;
+    private float[] otherData;
+    private float[] otherotherData;
+    private double[] dataNorm;
 
     private float t;
     private int currentIndex;
@@ -82,6 +93,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     {
         currentIndex = 0;
         earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
+        earthRenderer.material.SetTexture("_CompDataTextureArray", textureArraysArray[currentIndex].compDataTextureArray);
         earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
         earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
         earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
@@ -90,12 +102,6 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
 
     private void Update()
     {
-        t += Time.deltaTime;
-        if(t > 12.0f)
-        {
-            t -= 12.0f;
-            currentIndex = (currentIndex + 1) % textureArraysArray.Length;
-        }
 
     }
     public void SetIndex(int index)
@@ -103,6 +109,31 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
         currentIndex = index;
 
         earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
+        earthRenderer.material.SetTexture("_CompDataTextureArray", textureArraysArray[currentIndex].compDataTextureArray);
+        earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
+        earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
+        earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
+    }
+    public void SetIndexLower()
+    {
+        currentIndex--;
+        if(currentIndex < 0)
+        {
+            currentIndex = textureArraysArray.Length - 1;
+        }
+
+        earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
+        earthRenderer.material.SetTexture("_CompDataTextureArray", textureArraysArray[currentIndex].compDataTextureArray);
+        earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
+        earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
+        earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
+    }
+    public void SetIndexHigher()
+    {
+        currentIndex = (currentIndex + 1) % textureArraysArray.Length;
+
+        earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
+        earthRenderer.material.SetTexture("_CompDataTextureArray", textureArraysArray[currentIndex].compDataTextureArray);
         earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
         earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
         earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
@@ -251,11 +282,199 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                 texture.SetPixelData<float>(data, 0);
                 byte[] bytesJPG = texture.EncodeToJPG(100);
                 Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
-                string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/norm.jpg");
+                string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/2023.jpg");
                 File.WriteAllBytes(filePath, bytesJPG);
             }
             Debug.Log("Lowest value - " + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + " - " + lowestValue.ToString());
             Debug.Log("Highest value - " + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + " - " + highestValue.ToString());
+
+        }
+
+
+    }
+    public void ReadFilesNorm()
+    {
+        fileData = new double[(int)DataTypes.TwoMetersTemperature][];
+        // Read the binary files and store their data
+        ReadBinaryFiles();
+
+        int heightResolution = 180 * 4 + 1;
+        int widthResolution = 360 * 4;
+
+        timeCount = fileData[(int)DataTypes.Time].Length;
+        latitudeCount = fileData[(int)DataTypes.Latitude].Length;
+        longitudeCount = fileData[(int)DataTypes.Longitude].Length;
+
+        texture = new Texture2D(widthResolution, 12 * heightResolution, TextureFormat.RFloat, false);
+        dataNorm = new double[12 * (widthResolution) * (heightResolution)];
+        data = new float[12 * (widthResolution) * (heightResolution)];
+        otherData = new float[12 * (widthResolution) * (heightResolution)];
+        otherotherData = new float[12 * (widthResolution) * (heightResolution)];
+
+        int streamCount = (int)DataTypes.Count - (int)DataTypes.TwoMetersTemperature;
+        FileStream[] fileStreams = new FileStream[streamCount];
+
+        for (int i = 0; i < streamCount; ++i)
+        {
+            fileStreams[i] = new FileStream(Application.dataPath + filePaths[(int)DataTypes.TwoMetersTemperature + i] + ".dat", FileMode.Open, FileAccess.Read);
+        }
+
+
+        byte[] bytes = new byte[12 * latitudeCount * longitudeCount * sizeof(double)];
+        double[] doubleData = new double[12 * latitudeCount * longitudeCount];
+
+        int[] textureIndices = new int[latitudeCount * longitudeCount];
+        int[] valueIndices = new int[latitudeCount * longitudeCount];
+
+        int indicesIndex = 0;
+        for (int iy = 0; iy < latitudeCount; ++iy)
+        {
+            float latitude = (float)fileData[(int)DataTypes.Latitude][iy];
+            latitude = Mathf.Round(4.0f * (latitude + 90.0f));
+            for (int ix = 0; ix < longitudeCount; ++ix)
+            {
+                float longitude = (float)fileData[(int)DataTypes.Longitude][ix];
+                longitude *= 4.0f;
+                textureIndices[indicesIndex] = (int)(latitude * widthResolution) + (int)longitude;
+                int x = ix + longitudeCount / 2;
+                if (x >= longitudeCount)
+                {
+                    x -= longitudeCount;
+                }
+                int y = iy;
+                valueIndices[indicesIndex++] = (y) * longitudeCount + x;
+            }
+        }
+
+        for (int dataType = 0; dataType < 11; ++dataType)
+        {
+            for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
+            {
+                for (int i = 0; i < (widthResolution) * (heightResolution); ++i)
+                {
+                    dataNorm[monthIndex * widthResolution * heightResolution + i] = 0;
+                }
+            }
+            double div = 1.0f / 30.0f;
+            double minVal = normDataParams[dataType].minValue;
+            double maxVal = normDataParams[dataType].maxValue;
+            double minOverallVal = dataParams[dataType].minValue;
+            double maxOverallVal = dataParams[dataType].maxValue;
+            double lowestValue = double.MaxValue;
+            double highestValue = double.MinValue;
+            double lowestOverallValue = double.MaxValue;
+            double highestOverallValue = double.MinValue;
+            for (int yearIndex = 0; yearIndex < 31; ++yearIndex)
+            {
+
+                int bytesReadTemperature = fileStreams[dataType].Read(bytes, 0, bytes.Length);
+
+                int valueIndex = 0;
+                for (int k = 0; k < bytes.Length; k += sizeof(double))
+                {
+                    double value = (double)BitConverter.ToDouble(bytes, k);
+                    if (double.IsNaN(value) == true)
+                    {
+                        value = double.MinValue;
+                    }
+                    doubleData[valueIndex] = value;
+                    ++valueIndex;
+                }
+
+
+                if(yearIndex == 30)
+                {
+
+                    for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
+                    {
+                        for (int i = 0; i < (latitudeCount) * (longitudeCount); ++i)
+                        {
+                            int currentTextureIndex = textureIndices[i];
+                            int currentValueIndex = valueIndices[i];
+                            double compValue = dataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex];
+                            double newValue = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
+                            double value = newValue - compValue;
+
+                            float t;
+                            t = (float)((newValue - minOverallVal) / (maxOverallVal - minOverallVal));
+                            if (compValue < lowestOverallValue)
+                            {
+                                lowestOverallValue = compValue;
+                            }
+                            if (compValue > highestOverallValue)
+                            {
+                                highestOverallValue = compValue;
+                            }
+                            t = Mathf.Clamp01(t);
+                            otherotherData[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
+
+                            t = (float)((compValue - minOverallVal) / (maxOverallVal - minOverallVal));
+                            if (compValue < lowestOverallValue)
+                            {
+                                lowestOverallValue = compValue;
+                            }
+                            if (compValue > highestOverallValue)
+                            {
+                                highestOverallValue = compValue;
+                            }
+                            t = Mathf.Clamp01(t);
+                            data[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
+
+                            t = (float)((value - minVal) / (maxVal - minVal));
+                            if (value < lowestValue)
+                            {
+                                lowestValue = value;
+                            }
+                            if (value > highestValue)
+                            {
+                                highestValue = value;
+                            }
+                            t = Mathf.Clamp01(t);
+                            otherData[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
+                        }
+
+                    }
+                    texture.SetPixelData<float>(data, 0);
+                    byte[] bytesJPG = texture.EncodeToJPG(100);
+                    Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
+                    string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/norm.jpg");
+                    File.WriteAllBytes(filePath, bytesJPG);
+
+                    texture.SetPixelData<float>(otherData, 0);
+                    bytesJPG = texture.EncodeToJPG(100);
+                    Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
+                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/diff.jpg");
+                    File.WriteAllBytes(filePath, bytesJPG);
+
+                    texture.SetPixelData<float>(otherotherData, 0);
+                    bytesJPG = texture.EncodeToJPG(100);
+                    Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
+                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/2023.jpg");
+                    File.WriteAllBytes(filePath, bytesJPG);
+                }
+                else
+                {
+
+                    for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
+                    {
+                        for (int i = 0; i < (latitudeCount) * (longitudeCount); ++i)
+                        {
+                            int currentTextureIndex = textureIndices[i];
+                            int currentValueIndex = valueIndices[i];
+                            double value = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
+                            dataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] += value * div;
+
+                        }
+
+                    }
+                }
+
+            }
+            dataParams[dataType].minValue = lowestOverallValue;
+            dataParams[dataType].maxValue = highestOverallValue;
+            normDataParams[dataType].minValue = lowestValue;
+            normDataParams[dataType].maxValue = highestValue;
+            
 
         }
 
