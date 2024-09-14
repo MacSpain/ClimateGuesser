@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        currentZoom = minZoom;
+        currentZoom = minZoom + 0.5f*(maxZoom - minZoom);
         oldMousePosition = Input.mousePosition;
     }
 

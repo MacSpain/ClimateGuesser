@@ -114,7 +114,7 @@ public class ProceduralSphere : MonoBehaviour
 
 
 
-        var bounds = new Bounds(Vector3.zero, new Vector3(-500.0f, -500.0f, -500.0f));
+        var bounds = new Bounds(Vector3.zero, new Vector3(1.0f, 1.0f, 1.0f));
 
 
         meshData.subMeshCount = 1;
