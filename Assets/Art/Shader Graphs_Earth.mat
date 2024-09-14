@@ -99,11 +99,12 @@ Material:
     m_Ints: []
     m_Floats:
     - _Choice: 0
-    - _CloudsOpacity: 0.5
+    - _CloudsOpacity: 1
     - _CloudsSpeed: 0.01
     - _CountryIndex: 0
     - _DataLightness: 0.5
-    - _DataStrength: 1
+    - _DataStrength: 0
+    - _LightsStrength: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _TopologyStrength: 0.0015

@@ -11,7 +11,12 @@ public class CameraController : MonoBehaviour
 
     public float cameraSpeed = 1.0f;
 
+    public float snapiness = 5.0f;
+
     private float currentZoom = 1.0f;
+    private float targetZoom = 1.0f;
+    private float targetXAngle = 0.0f;
+    private float targetYAngle = 0.0f;
     private float currentXAngle = 0.0f;
     private float currentYAngle = 0.0f;
     private Vector3 oldMousePosition = Vector3.zero;
@@ -19,7 +24,8 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
-        currentZoom = minZoom + 0.5f*(maxZoom - minZoom);
+        targetZoom = minZoom + 0.5f*(maxZoom - minZoom);
+        currentZoom = targetZoom;
         oldMousePosition = Input.mousePosition;
     }
 
@@ -37,19 +43,19 @@ public class CameraController : MonoBehaviour
 
                 Vector3 newMousePosition = Input.mousePosition;
                 Vector3 diff = newMousePosition - oldMousePosition;
-                currentYAngle += cameraSpeed*diff.x;
-                if (currentYAngle > 360.0f)
+                targetYAngle += cameraSpeed*diff.x;
+                if (targetYAngle > 360.0f)
                 {
-                    currentYAngle -= 360.0f;
+                    targetYAngle -= 360.0f;
                 }
-                currentXAngle += cameraSpeed * diff.y;
-                if (currentXAngle > 89.0f)
+                targetXAngle += cameraSpeed * diff.y;
+                if (targetXAngle > 89.0f)
                 {
-                    currentXAngle = 89.0f;
+                    targetXAngle = 89.0f;
                 }
-                if (currentXAngle < -89.0f)
+                if (targetXAngle < -89.0f)
                 {
-                    currentXAngle = -89.0f;
+                    targetXAngle = -89.0f;
                 }
                 oldMousePosition = newMousePosition;
             }
@@ -62,16 +68,20 @@ public class CameraController : MonoBehaviour
         if(Input.mouseScrollDelta.y != 0)
         {
             float delta = Input.mouseScrollDelta.y;
-            currentZoom -= delta * zoomSpeed;
-            if(currentZoom < minZoom)
+            targetZoom -= delta * zoomSpeed;
+            if(targetZoom < minZoom)
             {
-                currentZoom = minZoom;
+                targetZoom = minZoom;
             }
-            if(currentZoom > maxZoom)
+            if(targetZoom > maxZoom)
             {
-                currentZoom = maxZoom;
+                targetZoom = maxZoom;
             }
         }
+
+        currentZoom = Mathf.Lerp(currentZoom, targetZoom, snapiness * Time.deltaTime);
+        currentXAngle = Mathf.Lerp(currentXAngle, targetXAngle, snapiness * Time.deltaTime);
+        currentYAngle = Mathf.Lerp(currentYAngle, targetYAngle, snapiness * Time.deltaTime);
 
         Vector3 currentVector = new Vector3(0.0f, 
             -Mathf.Sin(Mathf.Deg2Rad * currentXAngle), 
