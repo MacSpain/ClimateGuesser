@@ -32,9 +32,15 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
         Longitude,
         TwoMetersTemperature,
         TotalPrecipitation,
-        SnowFall,
-        SeaIceCover,
+        TotalCloudCover,
         LakeIceDepth,
+        ConvectivePrecipitation,
+        LeafAreaIndexHigh,
+        LeafAreaIndexLow,
+        Snowfall,
+        SnowDepth,
+        VolumetricSoilWaterLayer1,
+        VolumetricSoilWaterLayer2,
 
         Count
     }
@@ -190,13 +196,13 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
             }
         }
 
-        for (int dataType = 0; dataType < 5; ++dataType)
+        for (int dataType = 0; dataType < 11; ++dataType)
         {
             double minVal = dataParams[dataType].minValue;
             double maxVal = dataParams[dataType].maxValue;
             double lowestValue = minVal;
             double highestValue = maxVal;
-            for (int yearIndex = 0; yearIndex < 2; ++yearIndex)
+            for (int yearIndex = 0; yearIndex < 1; ++yearIndex)
             {
 
                 int bytesReadTemperature = fileStreams[dataType].Read(bytes, 0, bytes.Length);
@@ -245,7 +251,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                 texture.SetPixelData<float>(data, 0);
                 byte[] bytesJPG = texture.EncodeToJPG(100);
                 Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
-                string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/" + yearIndex.ToString() + ".jpg");
+                string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/norm.jpg");
                 File.WriteAllBytes(filePath, bytesJPG);
             }
             Debug.Log("Lowest value - " + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + " - " + lowestValue.ToString());

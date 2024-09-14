@@ -36,7 +36,7 @@ def read_nc_file(extract, nc_file):
             data = dataset.variables[example_var][:] 
             print(f'Przykładowe dane z zmiennej {example_var}:', data)
             if isinstance(data.data, np.ndarray):
-                data.data.astype('float').tofile('./Assets/Data/extracted_data/data/' + example_var + str(i) + '.dat')
+                data.data.astype('float').tofile('./Assets/Data/extracted_data/data/' + example_var + '.dat')
 
 
         dataset.close()
