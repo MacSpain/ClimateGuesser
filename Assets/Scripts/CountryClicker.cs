@@ -13,11 +13,14 @@ public class CountryClicker : MonoBehaviour
 
 
     private LightingSettings lightingSettings;
+    private ReadMeanTemperatureFiles reader;
     private bool dataMode;
+    private int dataChoice;
 
     void Start()
     {
         lightingSettings = FindObjectOfType<LightingSettings>();
+        reader = FindObjectOfType<ReadMeanTemperatureFiles>();
         dataMode = false;
         texturePixels = countryTexture.GetPixels();
         width = countryTexture.width;
@@ -25,6 +28,7 @@ public class CountryClicker : MonoBehaviour
         earthRenderer.material.SetFloat("_DataStrength", 0.0f);
         earthRenderer.material.SetFloat("_CloudsOpacity", 0.5f);
         earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
+        earthRenderer.material.SetFloat("_Choice", 0.0f);
     }
 
     void Update()
@@ -47,6 +51,34 @@ public class CountryClicker : MonoBehaviour
                 earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
 
             }
+        }
+        if (Input.GetKeyDown(KeyCode.Q) == true)
+        {
+            earthRenderer.material.SetFloat("_Choice", 0.0f);
+        }
+        if (Input.GetKeyDown(KeyCode.W) == true)
+        {
+            earthRenderer.material.SetFloat("_Choice", 1.0f);
+        }
+        if (Input.GetKeyDown(KeyCode.E) == true)
+        {
+            earthRenderer.material.SetFloat("_Choice", 2.0f);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha1) == true)
+        {
+            reader.SetIndex(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2) == true)
+        {
+            reader.SetIndex(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3) == true)
+        {
+            reader.SetIndex(2);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4) == true)
+        {
+            reader.SetIndex(3);
         }
         if (dataMode == true)
         {
@@ -73,6 +105,7 @@ public class CountryClicker : MonoBehaviour
 
                         int countryIndex = (int)val;
                     }
+                    earthRenderer.material.SetFloat("_CountryIndex", redValue);
 
                 }
             }

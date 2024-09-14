@@ -21,7 +21,7 @@ public class LightingSettings : MonoBehaviour
         naturalLighting = true;
         sun.enabled = true;
         sunTransform = sun.gameObject.transform;
-        RenderSettings.ambientLight = Color.black;
+        RenderSettings.ambientLight = Color.Lerp(Color.Lerp(Color.grey, Color.black, 0.5f), Color.blue, 0.15f);
     }
 
     public void SetLighting(bool natural)
@@ -32,7 +32,7 @@ public class LightingSettings : MonoBehaviour
         {
 
             sun.enabled = true;
-            RenderSettings.ambientLight = Color.black;
+            RenderSettings.ambientLight = Color.Lerp(Color.Lerp(Color.grey, Color.black, 0.25f), Color.blue, 0.15f);
         }
         else
         {

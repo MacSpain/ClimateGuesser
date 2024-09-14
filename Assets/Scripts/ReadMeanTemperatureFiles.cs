@@ -89,12 +89,17 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
         {
             t -= 12.0f;
             currentIndex = (currentIndex + 1) % textureArraysArray.Length;
-            earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
-            earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
-            earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
-            earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
         }
 
+    }
+    public void SetIndex(int index)
+    {
+        currentIndex = index;
+
+        earthRenderer.material.SetTexture("_OldDataTextureArray", textureArraysArray[currentIndex].oldDataTextureArray);
+        earthRenderer.material.SetTexture("_NewDataTextureArray", textureArraysArray[currentIndex].newDataTextureArray);
+        earthRenderer.material.SetTexture("_DataGradientTexture", gradientTextures[currentIndex]);
+        earthRenderer.material.SetTexture("_ComparisonDataGradientTexture", comparisonGradientTextures[currentIndex]);
     }
 
     public void CreateGradients()
