@@ -36,12 +36,17 @@ public class DataGatherer : MonoBehaviour
 
     public float[][] currentOldValues; 
     public float[][] currentNewValues; 
-    public float[][] currentComparisonValues; 
+    public float[][] currentComparisonValues;
+
+    public float[][] clickedOldValues;
+    public float[][] clickedNewValues;
+    public float[][] clickedComparisonValues;
 
     private Color[] texturePixels;
     private int width;
     private int height;
     private int valueWidth;
+    private int valueHeight;
     private float countryToValueWidth;
     private float countryToValueHeight;
     [SerializeField]
@@ -62,6 +67,30 @@ public class DataGatherer : MonoBehaviour
         countryToValueHeight = (float)oldNormArrays[0].height / (float)height;
     }
 
+
+    public float[] GetClickedValues(int dataType, DataUIManager.DataMode dataMode)
+    {
+        switch(dataMode)
+        {
+            case DataUIManager.DataMode.OldNorm:
+                {
+                    return clickedOldValues[dataType];
+                }
+                break;
+            case DataUIManager.DataMode.NewNorm:
+                {
+                    return clickedNewValues[dataType];
+                }
+                break;
+            case DataUIManager.DataMode.NormDifference:
+                {
+                    return clickedComparisonValues[dataType];
+                }
+                break;
+        }
+        return null;
+    }
+
     public void FillDataAtPoint(int valueIndex)
     {
         currentOldValues = new float[11][];
@@ -78,6 +107,25 @@ public class DataGatherer : MonoBehaviour
                 currentOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
                 currentNewValues[i][j] = newNormTextures[i][j][valueIndex].r;
                 currentComparisonValues[i][j] = comparisonTextures[i][j][valueIndex].r;
+            }
+        }
+    }
+    public void FillDataAtClickedPoint(int valueIndex)
+    {
+        clickedOldValues = new float[11][];
+        clickedNewValues = new float[11][];
+        clickedComparisonValues = new float[11][];
+
+        for (int i = 0; i < 11; ++i)
+        {
+            clickedOldValues[i] = new float[12];
+            clickedNewValues[i] = new float[12];
+            clickedComparisonValues[i] = new float[12];
+            for (int j = 0; j < 12; ++j)
+            {
+                clickedOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
+                clickedNewValues[i][j] = newNormTextures[i][j][valueIndex].r;
+                clickedComparisonValues[i][j] = comparisonTextures[i][j][valueIndex].r;
             }
         }
     }
@@ -109,8 +157,14 @@ public class DataGatherer : MonoBehaviour
             }
         }
         valueWidth = oldNormArrays[0].width;
+        valueHeight = oldNormArrays[0].height;
         countryToValueWidth = (float)oldNormArrays[0].width/(float)width;
         countryToValueHeight = (float)oldNormArrays[0].height/(float)height;
+        List<int>[] ownedByCountries = new List<int>[valueWidth*valueHeight];
+        for(int i = 0; i < valueWidth*valueHeight; ++i)
+        {
+            ownedByCountries[i] = new List<int>();
+        }
         float yValue = 0.0f;
         int index = 0;
         for(int y = 0; y < height; ++y)
@@ -127,9 +181,10 @@ public class DataGatherer : MonoBehaviour
 
                     int valueIndex = (int)yValue * valueWidth + (int)xValue;
 
-                    List<int> currentList = countryTextureValueIndices[countryIndex];
-                    if(currentList.Contains(valueIndex) == false)
+                    List<int> currentOwned = ownedByCountries[valueIndex];
+                    if (currentOwned.Contains(countryIndex) == false)
                     {
+                        List<int> currentList = countryTextureValueIndices[countryIndex];
                         currentList.Add(valueIndex);
                     }
 

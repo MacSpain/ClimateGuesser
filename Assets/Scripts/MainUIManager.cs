@@ -21,11 +21,34 @@ public class MainUIManager : MonoBehaviour
     private GameUIManager gameUI;
 
     private CountryClicker countryClicker;
+    private Button currentMenuButton;
+    private Button currentDataNormButton;
 
     private void Start()
     {
         countryClicker = FindObjectOfType<CountryClicker>(true);
         visualButton.onClick.Invoke();
+        
+    }
+
+
+    public void SetCurrentMenuButton(Button button)
+    {
+        if(currentMenuButton != null)
+        {
+            currentMenuButton.GetComponent<Image>().color = Color.grey;
+        }
+        currentMenuButton = button;
+        currentMenuButton.GetComponent<Image>().color = Color.white;
+    }
+    public void SetCurrentDataNormButton(Button button)
+    {
+        if (currentDataNormButton != null)
+        {
+            currentDataNormButton.GetComponent<Image>().color = Color.grey;
+        }
+        currentDataNormButton = button;
+        currentDataNormButton.GetComponent<Image>().color = Color.white;
     }
 
     public void SetVisual()
@@ -34,6 +57,7 @@ public class MainUIManager : MonoBehaviour
         dataUI.gameObject.SetActive(false);
         gameUI.gameObject.SetActive(false);
         countryClicker.SetMode(0);
+        SetCurrentMenuButton(visualButton);
     }
     public void SetData()
     {
@@ -41,6 +65,7 @@ public class MainUIManager : MonoBehaviour
         dataUI.gameObject.SetActive(true);
         gameUI.gameObject.SetActive(false);
         countryClicker.SetMode(1);
+        SetCurrentMenuButton(dataButton);
     }
     public void SetGame()
     {
@@ -48,5 +73,7 @@ public class MainUIManager : MonoBehaviour
         dataUI.gameObject.SetActive(false);
         gameUI.gameObject.SetActive(true);
         countryClicker.SetMode(2);
+
+        SetCurrentMenuButton(gameButton);
     }
 }

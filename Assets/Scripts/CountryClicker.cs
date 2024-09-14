@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,11 +22,14 @@ public class CountryClicker : MonoBehaviour
 
     private LightingSettings lightingSettings;
     private ReadMeanTemperatureFiles reader;
+    private DataUIManager dataUIManager;
     private Mode currentMode;
     private int dataChoice;
+    public int currentChosenCountry;
 
     void Start()
     {
+        currentChosenCountry = -1;
         lightingSettings = FindObjectOfType<LightingSettings>();
         reader = FindObjectOfType<ReadMeanTemperatureFiles>();
         currentMode = Mode.Visual;
@@ -74,6 +78,21 @@ public class CountryClicker : MonoBehaviour
         }
     }
 
+    public void ChooseCountry(int index)
+    {
+        earthRenderer.material.SetFloat("_CountryIndex", (float)(index)/255.0f);
+        if(index == 0)
+        {
+
+            dataUIManager.RegionSelected(-1, "");
+        }
+        else
+        {
+
+            dataUIManager.RegionSelected(index, countries[index].name);
+        }
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.D) == true)
@@ -97,18 +116,6 @@ public class CountryClicker : MonoBehaviour
                 earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
 
             }
-        }
-        if (Input.GetKeyDown(KeyCode.Q) == true)
-        {
-            earthRenderer.material.SetFloat("_Choice", 0.0f);
-        }
-        if (Input.GetKeyDown(KeyCode.W) == true)
-        {
-            earthRenderer.material.SetFloat("_Choice", 1.0f);
-        }
-        if (Input.GetKeyDown(KeyCode.E) == true)
-        {
-            earthRenderer.material.SetFloat("_Choice", 2.0f);
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow) == true)
         {
@@ -142,8 +149,21 @@ public class CountryClicker : MonoBehaviour
                         float val = 255.0f * redValue - 1.0f;
 
                         int countryIndex = (int)val;
+                        currentChosenCountry = countryIndex;
+
                     }
+                    currentChosenCountry = -1;
                     earthRenderer.material.SetFloat("_CountryIndex", redValue);
+
+                    if (currentChosenCountry == -1)
+                    {
+
+                        dataUIManager.RegionSelected(-1, "");
+                    }
+                    else
+                    {
+                        dataUIManager.RegionSelected(currentChosenCountry+1, countries[currentChosenCountry+1].name);
+                    }
 
                 }
             }
