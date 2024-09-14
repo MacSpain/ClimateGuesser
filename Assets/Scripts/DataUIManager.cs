@@ -33,6 +33,16 @@ public class DataUIManager : MonoBehaviour
     private string[] dataTypesNames;
     [SerializeField]
     private Renderer earthRenderer;
+    [SerializeField]
+    private GameObject playGuessButtonObject;
+    [SerializeField]
+    private GameObject guessObject;
+    [SerializeField]
+    private TMP_Text guessCountry;
+    [SerializeField]
+    private RawImage guessLegendImage;
+    [SerializeField]
+    private TMP_Text guessDistance;
 
     private DataMode currentDataMode = DataMode.OldNorm;
     private int currentDataType;
@@ -41,6 +51,17 @@ public class DataUIManager : MonoBehaviour
     private ReadMeanTemperatureFiles reader;
     private DataGatherer gatherer;
     private MainUIManager mainUIManager;
+
+    public void PrepareGuess()
+    {
+        guessObject.SetActive(true);
+        playGuessButtonObject.SetActive(false);
+    }
+    public void CloseGuess()
+    {
+        guessObject.SetActive(false);
+        playGuessButtonObject.SetActive(true);
+    }
 
     public void RegionSelected(int index, string region)
     {
@@ -53,25 +74,47 @@ public class DataUIManager : MonoBehaviour
         {
             currentRegionSelectionText.text = region;
         }
+        ChooseLegend(currentDataMode, currentDataType);
     }
+
 
     public void SetLegend(Texture2D legendTexture, double legendMinValue, double legendMaxValue, float[] values)
     {
         legendMinValueText.text = legendMinValue.ToString("F2");
         legendMaxValueText.text = legendMaxValue.ToString("F2");
         legendImage.material.SetTexture("_LegendTexture", legendTexture);
-        legendImage.material.SetFloat("_Value1", values[0]);
-        legendImage.material.SetFloat("_Value2", values[1]);
-        legendImage.material.SetFloat("_Value3", values[2]);
-        legendImage.material.SetFloat("_Value4", values[3]);
-        legendImage.material.SetFloat("_Value5", values[4]);
-        legendImage.material.SetFloat("_Value6", values[5]);
-        legendImage.material.SetFloat("_Value7", values[6]);
-        legendImage.material.SetFloat("_Value8", values[7]);
-        legendImage.material.SetFloat("_Value9", values[8]);
-        legendImage.material.SetFloat("_Value10", values[9]);
-        legendImage.material.SetFloat("_Value11", values[10]);
-        legendImage.material.SetFloat("_Value12", values[11]);
+        if (values != null)
+        {
+            legendImage.material.SetFloat("_Value1", values[0]);
+            legendImage.material.SetFloat("_Value2", values[1]);
+            legendImage.material.SetFloat("_Value3", values[2]);
+            legendImage.material.SetFloat("_Value4", values[3]);
+            legendImage.material.SetFloat("_Value5", values[4]);
+            legendImage.material.SetFloat("_Value6", values[5]);
+            legendImage.material.SetFloat("_Value7", values[6]);
+            legendImage.material.SetFloat("_Value8", values[7]);
+            legendImage.material.SetFloat("_Value9", values[8]);
+            legendImage.material.SetFloat("_Value10", values[9]);
+            legendImage.material.SetFloat("_Value11", values[10]);
+            legendImage.material.SetFloat("_Value12", values[11]);
+            legendImage.material.SetFloat("_Value12", values[11]);
+        }
+        else
+        {
+
+            legendImage.material.SetFloat("_Value1", 0.0f);
+            legendImage.material.SetFloat("_Value2", 0.0f);
+            legendImage.material.SetFloat("_Value3", 0.0f);
+            legendImage.material.SetFloat("_Value4", 0.0f);
+            legendImage.material.SetFloat("_Value5", 0.0f);
+            legendImage.material.SetFloat("_Value6", 0.0f);
+            legendImage.material.SetFloat("_Value7", 0.0f);
+            legendImage.material.SetFloat("_Value8", 0.0f);
+            legendImage.material.SetFloat("_Value9", 0.0f);
+            legendImage.material.SetFloat("_Value10", 0.0f);
+            legendImage.material.SetFloat("_Value11", 0.0f);
+            legendImage.material.SetFloat("_Value12", 0.0f);
+        }
     }
 
     public void ChooseLegend(DataMode dataMode, int dataType)
@@ -116,19 +159,19 @@ public class DataUIManager : MonoBehaviour
         {
             currentDataType = dataTypesNames.Length - 1;
         }
-        currentRegionSelectionText.text = dataTypesNames[currentDataType];
+        currentDataSelectionText.text = dataTypesNames[currentDataType];
         ChooseLegend(currentDataMode, currentDataType);
     }
     public void NextType()
     {
         currentDataType = (currentDataType + 1) % dataTypesNames.Length;
-        currentRegionSelectionText.text = dataTypesNames[currentDataType];
+        currentDataSelectionText.text = dataTypesNames[currentDataType];
         ChooseLegend(currentDataMode, currentDataType);
     }
     public void SetDataType(int index)
     {
         currentDataType = index;
-        currentRegionSelectionText.text = dataTypesNames[currentDataType];
+        currentDataSelectionText.text = dataTypesNames[currentDataType];
         ChooseLegend(currentDataMode, currentDataType);
     }
     public void SetDataMode(int index)
@@ -156,6 +199,7 @@ public class DataUIManager : MonoBehaviour
                 }
                 break;
         }
+        ChooseLegend(currentDataMode, currentDataType);
     }
 
     private void OnEnable()
@@ -175,5 +219,6 @@ public class DataUIManager : MonoBehaviour
         oldClimateNormButton.onClick.Invoke();
         mainUIManager.SetCurrentDataNormButton(oldClimateNormButton);
     }
+
 
 }

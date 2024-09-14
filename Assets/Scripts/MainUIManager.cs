@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class MainUIManager : MonoBehaviour
 {
     [SerializeField]
+    private Slider timeSlider;
+    [SerializeField]
     private Button visualButton;
     [SerializeField]
     private Button dataButton;
@@ -19,6 +21,12 @@ public class MainUIManager : MonoBehaviour
 
     [SerializeField]
     private GameUIManager gameUI;
+    [SerializeField]
+    private Renderer earthRenderer;
+    [SerializeField]
+    private RawImage legendImage;
+    [SerializeField]
+    private RawImage guessLegendImage;
 
     private CountryClicker countryClicker;
     private Button currentMenuButton;
@@ -75,5 +83,11 @@ public class MainUIManager : MonoBehaviour
         countryClicker.SetMode(2);
 
         SetCurrentMenuButton(gameButton);
+    }
+    private void Update()
+    {
+        earthRenderer.material.SetFloat("_CheckedTime", timeSlider.value);
+        legendImage.material.SetFloat("_CheckedTime", timeSlider.value);
+        guessLegendImage.material.SetFloat("_CheckedTime", timeSlider.value);
     }
 }

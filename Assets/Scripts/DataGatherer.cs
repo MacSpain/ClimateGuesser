@@ -65,11 +65,16 @@ public class DataGatherer : MonoBehaviour
         valueWidth = oldNormArrays[0].width;
         countryToValueWidth = (float)oldNormArrays[0].width / (float)width;
         countryToValueHeight = (float)oldNormArrays[0].height / (float)height;
+        GatherData();
     }
 
 
     public float[] GetClickedValues(int dataType, DataUIManager.DataMode dataMode)
     {
+        if(clickedOldValues == null)
+        {
+            return null;
+        }
         switch(dataMode)
         {
             case DataUIManager.DataMode.OldNorm:
@@ -91,8 +96,11 @@ public class DataGatherer : MonoBehaviour
         return null;
     }
 
-    public void FillDataAtPoint(int valueIndex)
+    public void FillDataAtPoint(int countryTextureX, int countryTextureY)
     {
+        float valueX = (float)countryTextureX * countryToValueWidth;
+        float valueY = (float)countryTextureY * countryToValueHeight;
+        int valueIndex = (int)valueY * valueWidth + (int)valueX;
         currentOldValues = new float[11][];
         currentNewValues = new float[11][];
         currentComparisonValues = new float[11][];
@@ -110,8 +118,12 @@ public class DataGatherer : MonoBehaviour
             }
         }
     }
-    public void FillDataAtClickedPoint(int valueIndex)
+    public void FillDataAtClickedPoint(int countryTextureX, int countryTextureY)
     {
+        float valueX = (float)countryTextureX * countryToValueWidth;
+        float valueY = (float)countryTextureY * countryToValueHeight;
+        int valueIndex = (int)valueY*valueWidth + (int)valueX;
+
         clickedOldValues = new float[11][];
         clickedNewValues = new float[11][];
         clickedComparisonValues = new float[11][];

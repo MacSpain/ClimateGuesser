@@ -23,6 +23,7 @@ public class CountryClicker : MonoBehaviour
     private LightingSettings lightingSettings;
     private ReadMeanTemperatureFiles reader;
     private DataUIManager dataUIManager;
+    private DataGatherer dataGatherer;
     private Mode currentMode;
     private int dataChoice;
     public int currentChosenCountry;
@@ -30,8 +31,10 @@ public class CountryClicker : MonoBehaviour
     void Start()
     {
         currentChosenCountry = -1;
-        lightingSettings = FindObjectOfType<LightingSettings>();
+        lightingSettings = FindObjectOfType<LightingSettings>(true);
         reader = FindObjectOfType<ReadMeanTemperatureFiles>();
+        dataUIManager = FindObjectOfType<DataUIManager>(true);
+        dataGatherer = FindObjectOfType<DataGatherer>(true);
         currentMode = Mode.Visual;
         texturePixels = countryTexture.GetPixels();
         width = countryTexture.width;
@@ -45,6 +48,10 @@ public class CountryClicker : MonoBehaviour
 
     public void SetMode(int index)
     {
+        if (lightingSettings == null)
+        {
+            lightingSettings = FindObjectOfType<LightingSettings>(true);
+        }
         currentMode = (Mode)(index);
         switch(currentMode)
         {
@@ -80,6 +87,11 @@ public class CountryClicker : MonoBehaviour
 
     public void ChooseCountry(int index)
     {
+        if(dataUIManager == null)
+        {
+            dataUIManager = FindObjectOfType<DataUIManager>(true);
+
+        }
         earthRenderer.material.SetFloat("_CountryIndex", (float)(index)/255.0f);
         if(index == 0)
         {
@@ -152,7 +164,13 @@ public class CountryClicker : MonoBehaviour
                         currentChosenCountry = countryIndex;
 
                     }
-                    currentChosenCountry = -1;
+                    else
+                    {
+
+                        currentChosenCountry = -1;
+                    }
+
+                    dataGatherer.FillDataAtClickedPoint(pointX, pointY);
                     earthRenderer.material.SetFloat("_CountryIndex", redValue);
 
                     if (currentChosenCountry == -1)
