@@ -85,6 +85,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     private float[] otherData;
     private float[] otherotherData;
     private double[] dataNorm;
+    private double[] otherDataNorm;
 
     private float t;
     private int currentIndex;
@@ -307,6 +308,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
 
         texture = new Texture2D(widthResolution, 12 * heightResolution, TextureFormat.RFloat, false);
         dataNorm = new double[12 * (widthResolution) * (heightResolution)];
+        otherDataNorm = new double[12 * (widthResolution) * (heightResolution)];
         data = new float[12 * (widthResolution) * (heightResolution)];
         otherData = new float[12 * (widthResolution) * (heightResolution)];
         otherotherData = new float[12 * (widthResolution) * (heightResolution)];
@@ -364,7 +366,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
             double highestValue = double.MinValue;
             double lowestOverallValue = double.MaxValue;
             double highestOverallValue = double.MinValue;
-            for (int yearIndex = 0; yearIndex < 31; ++yearIndex)
+            for (int yearIndex = 0; yearIndex < 60; ++yearIndex)
             {
 
                 int bytesReadTemperature = fileStreams[dataType].Read(bytes, 0, bytes.Length);
@@ -381,8 +383,41 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                     ++valueIndex;
                 }
 
+                if (yearIndex < 30)
+                {
 
-                if(yearIndex == 30)
+                    for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
+                    {
+                        for (int i = 0; i < (latitudeCount) * (longitudeCount); ++i)
+                        {
+                            int currentTextureIndex = textureIndices[i];
+                            int currentValueIndex = valueIndices[i];
+                            double value = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
+                            dataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] += value * div;
+
+                        }
+
+                    }
+                }
+                else
+                {
+
+                    for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
+                    {
+                        for (int i = 0; i < (latitudeCount) * (longitudeCount); ++i)
+                        {
+                            int currentTextureIndex = textureIndices[i];
+                            int currentValueIndex = valueIndices[i];
+                            double value = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
+                            otherDataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] += value * div;
+
+                        }
+
+                    }
+                }
+
+
+                if (yearIndex == 59)
                 {
 
                     for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
@@ -392,7 +427,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                             int currentTextureIndex = textureIndices[i];
                             int currentValueIndex = valueIndices[i];
                             double compValue = dataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex];
-                            double newValue = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
+                            double newValue = otherDataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex];
                             double value = newValue - compValue;
 
                             float t;
@@ -437,36 +472,24 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                     texture.SetPixelData<float>(data, 0);
                     byte[] bytesJPG = texture.EncodeToJPG(100);
                     Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
-                    string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/norm.jpg");
+                    string filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/normOld.jpg");
                     File.WriteAllBytes(filePath, bytesJPG);
 
                     texture.SetPixelData<float>(otherData, 0);
                     bytesJPG = texture.EncodeToJPG(100);
                     Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
-                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/diff.jpg");
+                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/diffNorms.jpg");
                     File.WriteAllBytes(filePath, bytesJPG);
 
                     texture.SetPixelData<float>(otherotherData, 0);
                     bytesJPG = texture.EncodeToJPG(100);
                     Directory.CreateDirectory(Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString());
-                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/2023.jpg");
+                    filePath = (Application.dataPath + outputPath + ((DataTypes)((int)DataTypes.TwoMetersTemperature + dataType)).ToString() + "/normNew.jpg");
                     File.WriteAllBytes(filePath, bytesJPG);
                 }
                 else
                 {
 
-                    for (int monthIndex = 0; monthIndex < 12; ++monthIndex)
-                    {
-                        for (int i = 0; i < (latitudeCount) * (longitudeCount); ++i)
-                        {
-                            int currentTextureIndex = textureIndices[i];
-                            int currentValueIndex = valueIndices[i];
-                            double value = doubleData[monthIndex * latitudeCount * longitudeCount + currentValueIndex];
-                            dataNorm[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] += value * div;
-
-                        }
-
-                    }
                 }
 
             }

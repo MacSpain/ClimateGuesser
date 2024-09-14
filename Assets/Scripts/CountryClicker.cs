@@ -26,6 +26,7 @@ public class CountryClicker : MonoBehaviour
         width = countryTexture.width;
         height = countryTexture.height;
         earthRenderer.material.SetFloat("_DataStrength", 0.0f);
+        earthRenderer.material.SetFloat("_DataSaturation", 1.0f);
         earthRenderer.material.SetFloat("_CloudsOpacity", 0.5f);
         earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
         earthRenderer.material.SetFloat("_Choice", 0.0f);
@@ -40,6 +41,7 @@ public class CountryClicker : MonoBehaviour
             {
                 lightingSettings.SetLighting(false);
                 earthRenderer.material.SetFloat("_DataStrength", 1.0f);
+                earthRenderer.material.SetFloat("_DataSaturation", 0.0f);
                 earthRenderer.material.SetFloat("_CloudsOpacity", 0.0f);
                 earthRenderer.material.SetFloat("_LightsStrength", 0.0f);
             }
@@ -47,6 +49,7 @@ public class CountryClicker : MonoBehaviour
             {
                 lightingSettings.SetLighting(true);
                 earthRenderer.material.SetFloat("_DataStrength", 0.0f);
+                earthRenderer.material.SetFloat("_DataSaturation", 1.0f);
                 earthRenderer.material.SetFloat("_CloudsOpacity", 0.5f);
                 earthRenderer.material.SetFloat("_LightsStrength", 1.0f);
 
