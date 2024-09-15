@@ -56,17 +56,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _CheckedTime: 0
-    - _Value1: 0.8078432
-    - _Value10: 0.85098046
-    - _Value11: 0.81568635
-    - _Value12: 0.7960785
-    - _Value2: 0.83921576
-    - _Value3: 0.882353
-    - _Value4: 0.91372555
-    - _Value5: 0.9333334
-    - _Value6: 0.9450981
-    - _Value7: 0.94117653
-    - _Value8: 0.92549026
-    - _Value9: 0.89019614
+    - _Value1: 0
+    - _Value10: 0
+    - _Value11: 0
+    - _Value12: 0
+    - _Value2: 0
+    - _Value3: 0
+    - _Value4: 0
+    - _Value5: 0
+    - _Value6: 0
+    - _Value7: 0
+    - _Value8: 0
+    - _Value9: 0
     m_Colors: []
   m_BuildTextureStacks: []

@@ -68,6 +68,7 @@ public class DataGatherer : MonoBehaviour
     private int clickedValueY;
     private DataUIManager dataUIManager;
     private CameraController cameraController;
+    private int currentGuessCountry;
 
     [SerializeField]
     public List<int>[] countryTextureValueIndices;
@@ -99,6 +100,20 @@ public class DataGatherer : MonoBehaviour
         float diffX = currentValueX - clickedValueX * countryToValueWidth;
         float diffY = currentValueY - clickedValueY * countryToValueWidth;
         return Mathf.Sqrt(diffX * diffX + diffY * diffY);
+    }
+
+    public float GetCurrentClickedScore()
+    {
+        float diffX = currentValueX - clickedValueX * countryToValueWidth;
+        float diffY = currentValueY - clickedValueY * countryToValueWidth;
+        float distance = Mathf.Sqrt(diffX * diffX + diffY * diffY);
+
+        float count = countryTextureValueIndices[currentGuessCountry].Count;
+        count = Mathf.Sqrt((float)count);
+        float low = 0.01f * count;
+        float high = 0.25f * count;
+        float t = Mathf.Clamp01((distance - low) / (high - low));
+        return (1.0f - t)*100.0f;
     }
 
     public float[] GetClickedValues(int dataType, DataUIManager.DataMode dataMode)
@@ -180,8 +195,8 @@ public class DataGatherer : MonoBehaviour
         }
         dataUIManager.GuessRegionSelected(countryIndex, countries[countryIndex].name);
 
-        float countryFX = (float)countryX / (float)valueWidth;
-        float  countryFY = (float)countryY / (float)valueHeight;
+        float countryFX = ((float)countryX) / (float)(valueWidth-1);
+        float countryFY = ((float)countryY) / (float)(valueHeight-1);
 
         float fy = (float)countryFY;
 
@@ -199,6 +214,8 @@ public class DataGatherer : MonoBehaviour
         targetMarker.localRotation = Quaternion.FromToRotation(Vector3.up, position.normalized);
 
         PointCameraAtCountry(countryIndex);
+
+        currentGuessCountry = countryIndex;
     }
 
     public void PointCameraAtCountry(int countryIndex)

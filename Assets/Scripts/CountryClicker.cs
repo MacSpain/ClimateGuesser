@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CountryClicker : MonoBehaviour
 {
@@ -143,7 +144,7 @@ public class CountryClicker : MonoBehaviour
             if (Input.GetMouseButtonDown(0) == true)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, 100000.0f, -1) == true)
+                if (EventSystem.current.IsPointerOverGameObject() == false && Physics.Raycast(ray, out RaycastHit hit, 100000.0f, -1) == true)
                 {
 
                     Vector3 hitPoint = hit.point.normalized;

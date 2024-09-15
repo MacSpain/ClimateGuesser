@@ -46,6 +46,10 @@ public class DataUIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text guessDistance;
     [SerializeField]
+    private TMP_Text guessScore;
+    [SerializeField]
+    private GameObject guessButtonObject;
+    [SerializeField]
     private GameObject guessTargetMarker;
 
     private DataMode currentDataMode = DataMode.OldNorm;
@@ -61,13 +65,17 @@ public class DataUIManager : MonoBehaviour
     {
         guessDistanceObject.SetActive(true);
         guessTargetMarker.SetActive(true);
+        guessButtonObject.SetActive(false);
         float distance = gatherer.GetCurrentClickedDistance();
         guessDistance.text = distance.ToString("F2");
+        float score = gatherer.GetCurrentClickedScore();
+        guessScore.text = score.ToString("F2");
     }
     public void PrepareGuess()
     {
         gatherer.ChoosePointInCountry();
         guessObject.SetActive(true);
+        guessButtonObject.SetActive(true);
         playGuessButtonObject.SetActive(false);
         guessDistanceObject.SetActive(false);
         guessTargetMarker.SetActive(false);
@@ -77,6 +85,7 @@ public class DataUIManager : MonoBehaviour
     public void CloseGuess()
     {
         guessObject.SetActive(false);
+        guessButtonObject.SetActive(false);
         playGuessButtonObject.SetActive(true);
         guessDistanceObject.SetActive(false);
         guessTargetMarker.SetActive(false);
