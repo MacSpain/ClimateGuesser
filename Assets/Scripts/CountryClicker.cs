@@ -18,6 +18,7 @@ public class CountryClicker : MonoBehaviour
     public int height;
     public Country[] countries;
     public Renderer earthRenderer;
+    public Transform playerMarker;
 
 
     private LightingSettings lightingSettings;
@@ -173,6 +174,8 @@ public class CountryClicker : MonoBehaviour
                         }
 
                         dataGatherer.FillDataAtClickedPoint(pointX, pointY);
+                        playerMarker.position = hit.point;
+                        playerMarker.localRotation = Quaternion.FromToRotation(Vector3.up, hit.point.normalized);
                         earthRenderer.material.SetFloat("_CountryIndex", redValue);
 
                         if (currentChosenCountry == -1)
@@ -205,40 +208,12 @@ public class CountryClicker : MonoBehaviour
                         {
 
                             dataGatherer.FillDataAtClickedPoint(pointX, pointY);
+                            playerMarker.position = hit.point;
+                            playerMarker.localRotation = Quaternion.FromToRotation(Vector3.up, hit.point.normalized);
                             earthRenderer.material.SetFloat("_CountryIndex", redValue);
 
                             dataUIManager.RegionSelected(currentChosenCountry, countries[currentChosenCountry].name);
                         }
-                    }
-
-                }
-            }
-        }
-        else if(currentMode == Mode.Game)
-        {
-
-            if (Input.GetMouseButtonDown(0) == true)
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out RaycastHit hit, 100000.0f, -1) == true)
-                {
-
-                    Vector3 hitPoint = hit.point.normalized;
-                    float longitude = Mathf.Atan2(hitPoint.z, hitPoint.x);
-                    if (longitude < 0)
-                    {
-                        longitude = 2.0f * Mathf.PI + longitude;
-                    }
-                    float latitude = Mathf.PI - Mathf.Acos(hitPoint.y);
-
-                    int pointX = (int)((longitude / (2.0f * Mathf.PI)) * width);
-                    int pointY = (int)((latitude / (Mathf.PI)) * height);
-                    float redValue = texturePixels[pointY * width + pointX].r;
-                    if (redValue > 0.0f)
-                    {
-                        float val = 255.0f * redValue - 1.0f;
-
-                        int countryIndex = (int)val;
                     }
 
                 }

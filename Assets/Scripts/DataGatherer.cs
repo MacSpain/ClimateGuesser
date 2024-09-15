@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Unity.Burst.CompilerServices;
+using UnityEngine.UIElements;
+using Unity.Mathematics;
+
+
+
 
 
 #if UNITY_EDITOR
@@ -36,6 +42,9 @@ public class DataGatherer : MonoBehaviour
     private Texture2DArray[] comparisonArrays;
     [SerializeField]
     private Country[] countries;
+
+
+    public Transform targetMarker;
 
     public float[][] currentOldValues; 
     public float[][] currentNewValues; 
@@ -146,7 +155,7 @@ public class DataGatherer : MonoBehaviour
     }
     public void ChoosePointInCountry()
     {
-        int countryChoice = Random.Range(0, 5*countries.Length);
+        int countryChoice = UnityEngine.Random.Range(0, 5*countries.Length);
         int countryIndex = 0;
         while(countryChoice > 0)
         {
@@ -160,14 +169,34 @@ public class DataGatherer : MonoBehaviour
             }
             countryIndex = (countryIndex + 1) % countries.Length;
         }
-        int pointIndex = Random.Range(0, countryTextureValueIndices[countryIndex].Count);
+        int pointIndex = UnityEngine.Random.Range(0, countryTextureValueIndices[countryIndex].Count);
         int countryValueIndex = countryTextureValueIndices[countryIndex][pointIndex];
-        FillDataAtPoint(countryValueIndex % valueWidth, countryValueIndex / valueWidth);
+        int countryX = countryValueIndex % valueWidth;
+        int countryY = countryValueIndex / valueWidth;
+        FillDataAtPoint(countryX, countryY);
         if(dataUIManager == null)
         {
             dataUIManager = FindObjectOfType<DataUIManager>(true);
         }
         dataUIManager.GuessRegionSelected(countryIndex, countries[countryIndex].name);
+
+        float countryFX = (float)countryX / (float)valueWidth;
+        float  countryFY = (float)countryY / (float)valueHeight;
+
+        float fy = (float)countryFY;
+
+
+        float polarDiv = Mathf.PI;
+        float azimuthDiv = (2.0f * Mathf.PI);
+
+        float currPolar = -(1.0f - fy) * polarDiv;
+
+        float currAzimuth = (countryFX + 0.5f) * azimuthDiv;
+
+        Vector3 position = 0.5f * new Vector3(math.sin(currPolar) * math.cos(currAzimuth), math.cos(currPolar), math.sin(currPolar) * math.sin(currAzimuth));
+
+        targetMarker.position = position;
+        targetMarker.localRotation = Quaternion.FromToRotation(Vector3.up, position.normalized);
 
         PointCameraAtCountry(countryIndex);
     }
