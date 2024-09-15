@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Unity.Mathematics;
+
 
 
 #if UNITY_EDITOR
@@ -76,7 +78,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
     public Texture2D[] gradientTextures;
     public Texture2D[] comparisonGradientTextures;
     public DataParams[] dataParams;
-    public DataParams[] normDataParams;
+    public double[] normDataRanges;
 
     private double[][] fileData;
     private Texture2D texture;
@@ -361,12 +363,10 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                 }
             }
             double div = 1.0f / 30.0f;
-            double minVal = normDataParams[dataType].minValue;
-            double maxVal = normDataParams[dataType].maxValue;
+            double range = normDataRanges[dataType];
             double minOverallVal = dataParams[dataType].minValue;
             double maxOverallVal = dataParams[dataType].maxValue;
-            double lowestValue = double.MaxValue;
-            double highestValue = double.MinValue;
+            double bestRange = 0.0;
             double lowestOverallValue = double.MaxValue;
             double highestOverallValue = double.MinValue;
             for (int yearIndex = 0; yearIndex < 60; ++yearIndex)
@@ -458,22 +458,10 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                             t = Mathf.Clamp01(t);
                             data[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
 
-                            t = (float)((value - minVal) / (maxVal - minVal));
-                            if (value < lowestValue)
+                            t = (float)(0.5f*((value / range) + 1.0f));
+                            if (math.abs(value) > bestRange)
                             {
-                                lowestValue = value;
-                                if(-value > highestValue)
-                                {
-                                    highestValue = -value; 
-                                }
-                            }
-                            if (value > highestValue)
-                            {
-                                highestValue = value;
-                                if (-value < lowestValue)
-                                {
-                                    lowestValue = -value;
-                                }
+                                bestRange = math.abs(value);
                             }
                             t = Mathf.Clamp01(t);
                             otherData[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;
@@ -502,8 +490,7 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
             }
             dataParams[dataType].minValue = lowestOverallValue;
             dataParams[dataType].maxValue = highestOverallValue;
-            normDataParams[dataType].minValue = lowestValue;
-            normDataParams[dataType].maxValue = highestValue;
+            normDataRanges[dataType] = bestRange;
             
 
         }

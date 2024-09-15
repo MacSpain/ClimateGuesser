@@ -35,7 +35,6 @@ public class CameraController : MonoBehaviour
         {
             targetXAngle = -89.0f;
         }
-        Debug.Log(x);
         targetYAngle = 180.0f - (2.0f * (x + 0.75f) * 180.0f);
         if (targetYAngle > 360.0f)
         {
@@ -45,7 +44,6 @@ public class CameraController : MonoBehaviour
         {
             targetYAngle += 360.0f;
         }
-        Debug.Log(targetYAngle);
     }
 
     void Start()

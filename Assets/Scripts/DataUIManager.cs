@@ -220,8 +220,8 @@ public class DataUIManager : MonoBehaviour
                 {
 
                     texture = reader.comparisonGradientTextures[dataType];
-                    minVal = reader.normDataParams[dataType].minValue;
-                    maxVal = reader.normDataParams[dataType].maxValue;
+                    minVal = -reader.normDataRanges[dataType];
+                    maxVal = reader.normDataRanges[dataType];
                 }
                 break;
         }
