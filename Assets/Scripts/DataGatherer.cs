@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using Unity.Burst.CompilerServices;
 using UnityEngine.UIElements;
 using Unity.Mathematics;
+using Unity.Collections;
+using System;
+
+
 
 
 
@@ -54,7 +57,7 @@ public class DataGatherer : MonoBehaviour
     public float[][] clickedNewValues;
     public float[][] clickedComparisonValues;
 
-    private Color[] texturePixels;
+    //private Color[] texturePixels;
     private int width;
     private int height;
     private int valueWidth;
@@ -73,11 +76,11 @@ public class DataGatherer : MonoBehaviour
     [SerializeField]
     public List<int>[] countryTextureValueIndices;
     [SerializeField]
-    private Color[][][] oldNormTextures;
+    private NativeArray<float>[][] oldNormTextures;
     [SerializeField]
-    private Color[][][] newNormTextures;
+    private NativeArray<float>[][] newNormTextures;
     [SerializeField]
-    private Color[][][] comparisonTextures;
+    private NativeArray<float>[][] comparisonTextures;
     [SerializeField]
     private float[] countryXs;
     [SerializeField]
@@ -128,17 +131,14 @@ public class DataGatherer : MonoBehaviour
                 {
                     return clickedOldValues[dataType];
                 }
-                break;
             case DataUIManager.DataMode.NewNorm:
                 {
                     return clickedNewValues[dataType];
                 }
-                break;
             case DataUIManager.DataMode.NormDifference:
                 {
                     return clickedComparisonValues[dataType];
                 }
-                break;
         }
         return null;
     }
@@ -154,17 +154,14 @@ public class DataGatherer : MonoBehaviour
                 {
                     return currentOldValues[dataType];
                 }
-                break;
             case DataUIManager.DataMode.NewNorm:
                 {
                     return currentNewValues[dataType];
                 }
-                break;
             case DataUIManager.DataMode.NormDifference:
                 {
                     return currentComparisonValues[dataType];
                 }
-                break;
         }
         return null;
     }
@@ -251,9 +248,9 @@ public class DataGatherer : MonoBehaviour
 
             for (int j = 0; j < 12; ++j)
             {
-                currentOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
-                currentNewValues[i][j] = newNormTextures[i][j][valueIndex].r;
-                currentComparisonValues[i][j] = comparisonTextures[i][j][valueIndex].r;
+                currentOldValues[i][j] = oldNormTextures[i][j][valueIndex];
+                currentNewValues[i][j] = newNormTextures[i][j][valueIndex];
+                currentComparisonValues[i][j] = comparisonTextures[i][j][valueIndex];
             }
         }
     }
@@ -289,9 +286,9 @@ public class DataGatherer : MonoBehaviour
             }
             for (int j = 0; j < 12; ++j)
             {
-                clickedOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
-                clickedNewValues[i][j] = newNormTextures[i][j][valueIndex].r;
-                clickedComparisonValues[i][j] = comparisonTextures[i][j][valueIndex].r;
+                clickedOldValues[i][j] = oldNormTextures[i][j][valueIndex];
+                clickedNewValues[i][j] = newNormTextures[i][j][valueIndex];
+                clickedComparisonValues[i][j] = comparisonTextures[i][j][valueIndex];
             }
         }
     }
@@ -299,7 +296,7 @@ public class DataGatherer : MonoBehaviour
     public void GatherData()
     {
 
-        texturePixels = countryTexture.GetPixels();
+        //texturePixels = countryTexture.GetPixels();
         countryTextureValueIndices = new List<int>[countries.Length];
         for(int i = 0; i < countries.Length; ++i)
         {
@@ -312,19 +309,19 @@ public class DataGatherer : MonoBehaviour
         float[] countryXValues = new float[countries.Length];
         float[] countryYValues = new float[countries.Length];
         float[] countryValuesCounts = new float[countries.Length];
-        oldNormTextures = new Color[11][][];
-        newNormTextures = new Color[11][][];
-        comparisonTextures = new Color[11][][];
+        oldNormTextures = new NativeArray<float>[11][];
+        newNormTextures = new NativeArray<float>[11][];
+        comparisonTextures = new NativeArray<float>[11][];
         for (int i = 0; i < 11; ++i)
         {
-            oldNormTextures[i] = new Color[12][];
-            newNormTextures[i] = new Color[12][];
-            comparisonTextures[i] = new Color[12][];
+            oldNormTextures[i] = new NativeArray<float>[12];
+            newNormTextures[i] = new NativeArray<float>[12];
+            comparisonTextures[i] = new NativeArray<float>[12];
             for (int j = 0; j < 12; ++j)
             {
-                oldNormTextures[i][j] = oldNormArrays[i].GetPixels(j);
-                newNormTextures[i][j] = newNormArrays[i].GetPixels(j);
-                comparisonTextures[i][j] = comparisonArrays[i].GetPixels(j);
+                oldNormTextures[i][j] = oldNormArrays[i].GetPixelData<float>(0, j);
+                newNormTextures[i][j] = newNormArrays[i].GetPixelData<float>(0, j);
+                comparisonTextures[i][j] = comparisonArrays[i].GetPixelData<float>(0, j);
             }
         }
         valueWidth = oldNormArrays[0].width;
@@ -343,7 +340,7 @@ public class DataGatherer : MonoBehaviour
             float xValue = 0.0f;
             for (int x = 0; x < width; ++x)
             {
-                float redValue = texturePixels[index].r;
+                float redValue = countryTexture.GetPixel(x, y).r;
                 if (redValue > 0.0f)
                 {
                     float val = 255.0f * redValue - 1.0f;

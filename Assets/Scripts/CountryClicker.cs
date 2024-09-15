@@ -14,7 +14,7 @@ public class CountryClicker : MonoBehaviour
     }
 
     public Texture2D countryTexture;
-    public Color[] texturePixels;
+    //public Color[] texturePixels;
     public int width;
     public int height;
     public Country[] countries;
@@ -38,7 +38,7 @@ public class CountryClicker : MonoBehaviour
         dataUIManager = FindObjectOfType<DataUIManager>(true);
         dataGatherer = FindObjectOfType<DataGatherer>(true);
         currentMode = Mode.Visual;
-        texturePixels = countryTexture.GetPixels();
+        //texturePixels = countryTexture.GetPixels();
         width = countryTexture.width;
         height = countryTexture.height;
         earthRenderer.material.SetFloat("_DataStrength", 0.0f);
@@ -157,7 +157,7 @@ public class CountryClicker : MonoBehaviour
 
                     int pointX = (int)((longitude / (2.0f * Mathf.PI)) * width);
                     int pointY = (int)((latitude / (Mathf.PI)) * height);
-                    float redValue = texturePixels[pointY * width + pointX].r;
+                    float redValue = countryTexture.GetPixel(pointX, pointY).r;
                     if (dataUIManager.guessObject.activeSelf == false)
                     {
                         if (redValue > 0.0f)
