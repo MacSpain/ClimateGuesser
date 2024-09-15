@@ -5,11 +5,11 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEditor;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+#if UNITY_EDITOR
+using UnityEditor;
 [CustomEditor(typeof(ProceduralSphere))]
 public class ProceduralSphereEditor : Editor
 {
@@ -24,6 +24,7 @@ public class ProceduralSphereEditor : Editor
         }
     }
 }
+#endif
 
 public class ProceduralSphere : MonoBehaviour
 {

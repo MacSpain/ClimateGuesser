@@ -2,9 +2,10 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 
+#if UNITY_EDITOR
+using UnityEditor;
 [CustomEditor(typeof(ReadMeanTemperatureFiles))]
 public class ReadMeanTemperatureFilesEditor : Editor
 {
@@ -28,6 +29,7 @@ public class ReadMeanTemperatureFilesEditor : Editor
         }
     }
 }
+#endif
 
 public class ReadMeanTemperatureFiles : MonoBehaviour
 {
@@ -460,10 +462,18 @@ public class ReadMeanTemperatureFiles : MonoBehaviour
                             if (value < lowestValue)
                             {
                                 lowestValue = value;
+                                if(-value > highestValue)
+                                {
+                                    highestValue = -value; 
+                                }
                             }
                             if (value > highestValue)
                             {
                                 highestValue = value;
+                                if (-value < lowestValue)
+                                {
+                                    lowestValue = -value;
+                                }
                             }
                             t = Mathf.Clamp01(t);
                             otherData[(monthIndex * widthResolution * heightResolution) + currentTextureIndex] = t;

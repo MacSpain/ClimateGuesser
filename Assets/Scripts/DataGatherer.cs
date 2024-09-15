@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine;
 
 
+#if UNITY_EDITOR
+using UnityEditor;
 [CustomEditor(typeof(DataGatherer))]
 public class DataGathererEditor : Editor
 {
@@ -19,6 +21,7 @@ public class DataGathererEditor : Editor
         }
     }
 }
+#endif
 
 
 public class DataGatherer : MonoBehaviour
@@ -55,6 +58,7 @@ public class DataGatherer : MonoBehaviour
     private int clickedValueX;
     private int clickedValueY;
     private DataUIManager dataUIManager;
+    private CameraController cameraController;
 
     [SerializeField]
     public List<int>[] countryTextureValueIndices;
@@ -64,6 +68,10 @@ public class DataGatherer : MonoBehaviour
     private Color[][][] newNormTextures;
     [SerializeField]
     private Color[][][] comparisonTextures;
+    [SerializeField]
+    private float[] countryXs;
+    [SerializeField]
+    private float[] countryYs;
 
     private void Start()
     {
@@ -73,6 +81,7 @@ public class DataGatherer : MonoBehaviour
         countryToValueWidth = (float)oldNormArrays[0].width / (float)width;
         countryToValueHeight = (float)oldNormArrays[0].height / (float)height;
         dataUIManager = FindObjectOfType<DataUIManager>(true);
+        cameraController = FindObjectOfType<CameraController>(true);
         GatherData();
     }
 
@@ -159,6 +168,17 @@ public class DataGatherer : MonoBehaviour
             dataUIManager = FindObjectOfType<DataUIManager>(true);
         }
         dataUIManager.GuessRegionSelected(countryIndex, countries[countryIndex].name);
+
+        PointCameraAtCountry(countryIndex);
+    }
+
+    public void PointCameraAtCountry(int countryIndex)
+    {
+        if (countryIndex > -1)
+        {
+            cameraController.SetTargetAt(countryXs[countryIndex], countryYs[countryIndex]);
+        }
+
     }
 
     public void FillDataAtPoint(int countryValueX, int countryValueY)
@@ -166,16 +186,24 @@ public class DataGatherer : MonoBehaviour
         currentValueX = (int)countryValueX;
         currentValueY = (int)countryValueY;
         int valueIndex = (int)countryValueY * valueWidth + (int)countryValueX;
-        currentOldValues = new float[11][];
-        currentNewValues = new float[11][];
-        currentComparisonValues = new float[11][];
+
+        if (currentOldValues == null)
+        {
+            currentOldValues = new float[11][];
+            currentNewValues = new float[11][];
+            currentComparisonValues = new float[11][];
+        }
 
         for(int i = 0; i < 11; ++i)
         {
-            currentOldValues[i] = new float[12];
-            currentNewValues[i] = new float[12];
-            currentComparisonValues[i] = new float[12];
-            for(int j = 0; j < 12; ++j)
+            if (currentOldValues[i] == null)
+            {
+                currentOldValues[i] = new float[12];
+                currentNewValues[i] = new float[12];
+                currentComparisonValues[i] = new float[12];
+            }
+
+            for (int j = 0; j < 12; ++j)
             {
                 currentOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
                 currentNewValues[i][j] = newNormTextures[i][j][valueIndex].r;
@@ -183,6 +211,14 @@ public class DataGatherer : MonoBehaviour
             }
         }
     }
+
+    public void ResetClickedData()
+    {
+        clickedOldValues = null;
+        clickedNewValues = null;
+        clickedComparisonValues = null;
+    }
+
     public void FillDataAtClickedPoint(int countryTextureX, int countryTextureY)
     {
         float valueX = (float)countryTextureX * countryToValueWidth;
@@ -191,15 +227,20 @@ public class DataGatherer : MonoBehaviour
         clickedValueY = (int)countryTextureY;
         int valueIndex = (int)valueY*valueWidth + (int)valueX;
 
-        clickedOldValues = new float[11][];
-        clickedNewValues = new float[11][];
-        clickedComparisonValues = new float[11][];
-
+        if (clickedOldValues == null)
+        {
+            clickedOldValues = new float[11][];
+            clickedNewValues = new float[11][];
+            clickedComparisonValues = new float[11][];
+        }
         for (int i = 0; i < 11; ++i)
         {
-            clickedOldValues[i] = new float[12];
-            clickedNewValues[i] = new float[12];
-            clickedComparisonValues[i] = new float[12];
+            if (clickedOldValues[i] == null)
+            {
+                clickedOldValues[i] = new float[12];
+                clickedNewValues[i] = new float[12];
+                clickedComparisonValues[i] = new float[12];
+            }
             for (int j = 0; j < 12; ++j)
             {
                 clickedOldValues[i][j] = oldNormTextures[i][j][valueIndex].r;
@@ -220,6 +261,11 @@ public class DataGatherer : MonoBehaviour
         }
         width = countryTexture.width;
         height = countryTexture.height;
+        countryXs = new float[countries.Length];
+        countryYs = new float[countries.Length];
+        float[] countryXValues = new float[countries.Length];
+        float[] countryYValues = new float[countries.Length];
+        float[] countryValuesCounts = new float[countries.Length];
         oldNormTextures = new Color[11][][];
         newNormTextures = new Color[11][][];
         comparisonTextures = new Color[11][][];
@@ -258,6 +304,10 @@ public class DataGatherer : MonoBehaviour
 
                     int countryIndex = (int)val;
 
+                    countryXValues[countryIndex] += (float)x / (float)width;
+                    countryYValues[countryIndex] += (float)y / (float)height;
+                    countryValuesCounts[countryIndex]++;
+
                     int valueIndex = (int)yValue * valueWidth + (int)xValue;
 
                     List<int> currentOwned = ownedByCountries[valueIndex];
@@ -272,6 +322,12 @@ public class DataGatherer : MonoBehaviour
                 ++index;
             }
             yValue += countryToValueHeight;
+        }
+
+        for(int i = 0; i < countries.Length; ++i)
+        {
+            countryXs[i] = countryXValues[i] / (float)countryValuesCounts[i];
+            countryYs[i] = countryYValues[i] / (float)countryValuesCounts[i];
         }
     }
 }

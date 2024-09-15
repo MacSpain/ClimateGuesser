@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.LightingExplorerTableColumn;
 
 public class DataUIManager : MonoBehaviour
 {
@@ -92,6 +91,7 @@ public class DataUIManager : MonoBehaviour
         else
         {
             guessCountry.text = region;
+            gatherer.ResetClickedData();
             countryClicker.ChooseCountry(guessRegionSelected + 1);
         }
         ChooseLegend(currentDataMode, currentDataType);
@@ -99,6 +99,10 @@ public class DataUIManager : MonoBehaviour
 
     public void RegionSelected(int index, string region)
     {
+        if(currentRegionSelected != index)
+        {
+            gatherer.PointCameraAtCountry(index);
+        }
         currentRegionSelected = index;
         if (index == -1)
         {
@@ -289,6 +293,7 @@ public class DataUIManager : MonoBehaviour
         }
         SetDataType(currentDataType);
         countryClicker.ChooseCountry(0);
+        gatherer.ResetClickedData();
         RegionSelected(-1, "");
         earthRenderer.material.SetFloat("_Choice", (float)(int)currentDataMode);
         ChooseLegend(currentDataMode, currentDataType);
