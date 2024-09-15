@@ -110,8 +110,8 @@ public class DataGatherer : MonoBehaviour
 
         float count = countryTextureValueIndices[currentGuessCountry].Count;
         count = Mathf.Sqrt((float)count);
-        float low = 0.01f * count;
-        float high = 0.25f * count;
+        float low = 0.1f * count;
+        float high = 0.5f * count;
         float t = Mathf.Clamp01((distance - low) / (high - low));
         return (1.0f - t)*100.0f;
     }
@@ -361,6 +361,7 @@ public class DataGatherer : MonoBehaviour
                     {
                         List<int> currentList = countryTextureValueIndices[countryIndex];
                         currentList.Add(valueIndex);
+                        currentOwned.Add(countryIndex);
                     }
 
                 }

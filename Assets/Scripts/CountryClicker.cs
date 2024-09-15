@@ -189,7 +189,7 @@ public class CountryClicker : MonoBehaviour
                             dataUIManager.RegionSelected(currentChosenCountry, countries[currentChosenCountry].name);
                         }
                     }
-                    else
+                    else if(dataUIManager.guessButtonObject.activeSelf == true)
                     {
 
                         if (redValue > 0.0f)

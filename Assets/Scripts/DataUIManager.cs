@@ -48,7 +48,7 @@ public class DataUIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text guessScore;
     [SerializeField]
-    private GameObject guessButtonObject;
+    public GameObject guessButtonObject;
     [SerializeField]
     private GameObject guessTargetMarker;
 
