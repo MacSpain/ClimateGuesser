@@ -138,7 +138,7 @@ public class ProceduralSphere : MonoBehaviour
 
     void Update()
     {
-        
+        transform.Rotate(Vector3.up, 0.01f * Time.deltaTime * 360.0f);
     }
 }
 

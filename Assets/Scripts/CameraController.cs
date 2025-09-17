@@ -17,9 +17,9 @@ public class CameraController : MonoBehaviour
 
     private float currentZoom = 1.0f;
     private float targetZoom = 1.0f;
-    private float targetXAngle = 0.0f;
+    private float targetXAngle = 35.0f;
     private float targetYAngle = 0.0f;
-    private float currentXAngle = 0.0f;
+    private float currentXAngle = 35.0f;
     private float currentYAngle = 0.0f;
     private Vector3 oldMousePosition = Vector3.zero;
     private bool rightPressed = false;
