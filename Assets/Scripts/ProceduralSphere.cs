@@ -30,6 +30,9 @@ public class ProceduralSphere : MonoBehaviour
 {
     public const int vertexDimCount = 720;
 
+    public const float rotateDT = (1.0f / 60.0f) * 360.0f;
+    public float rotateTime = 0.0f;
+    private float[] times = new float[864];
 
     public void CreateMesh()
     {
@@ -138,7 +141,20 @@ public class ProceduralSphere : MonoBehaviour
 
     void Update()
     {
-        transform.Rotate(Vector3.up, 0.01f * Time.deltaTime * 360.0f);
+        //transform.rotation = Quaternion.Euler(0.0f, times[Time.frameCount % 1440], 0.0f);
+        transform.rotation = Quaternion.Euler(0.0f, 170.0f, 0.0f);
+    }
+
+    private void Start()
+    {
+        float dT = 360.0f / 864.0f;
+        float t = 0.0f;
+        for(int i = 0; i < 864; ++i)
+        {
+            times[i] = t;
+
+            t += dT;
+        }
     }
 }
 
