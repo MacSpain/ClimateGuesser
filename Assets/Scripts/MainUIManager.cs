@@ -27,6 +27,8 @@ public class MainUIManager : MonoBehaviour
     private RawImage legendImage;
     [SerializeField]
     private RawImage guessLegendImage;
+    [SerializeField]
+    private Toggle rotatingButton;
 
     private CountryClicker countryClicker;
     private Button currentMenuButton;

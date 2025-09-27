@@ -55,7 +55,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CheckedTime: 5.4827576
+    - _CheckedTime: 9.630699
     - _Value1: 0
     - _Value10: 0
     - _Value11: 0

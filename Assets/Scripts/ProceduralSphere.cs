@@ -31,8 +31,13 @@ public class ProceduralSphere : MonoBehaviour
     public const int vertexDimCount = 720;
 
     public const float rotateDT = (1.0f / 60.0f) * 360.0f;
-    public float rotateTime = 0.0f;
-    private float[] times = new float[864];
+    private float rotateTime = 0.0f;
+    private float[] times;
+
+    public int targetFramerate = 24;
+    public int cycleInSeconds = 60;
+
+    private bool rotating = true;
 
     public void CreateMesh()
     {
@@ -139,23 +144,38 @@ public class ProceduralSphere : MonoBehaviour
 
     }
 
+    public void ToggleRotating()
+    {
+        rotating = !rotating;
+    }
+
     void Update()
     {
-        //transform.rotation = Quaternion.Euler(0.0f, times[Time.frameCount % 1440], 0.0f);
-        transform.rotation = Quaternion.Euler(0.0f, 170.0f, 0.0f);
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            ToggleRotating();
+        }
+
+        if (rotating == true)
+        {
+            transform.rotation = Quaternion.Euler(0.0f, times[Time.frameCount % (targetFramerate * cycleInSeconds)], 0.0f);
+        }
+        //transform.rotation = Quaternion.Euler(0.0f, 170.0f, 0.0f);
     }
 
     private void Start()
     {
-        float dT = 360.0f / 864.0f;
+        times = new float[targetFramerate * cycleInSeconds];
+        float dT = 360.0f / (float)(targetFramerate * cycleInSeconds);
         float t = 0.0f;
-        for(int i = 0; i < 864; ++i)
+        for(int i = 0; i < targetFramerate * cycleInSeconds; ++i)
         {
             times[i] = t;
 
             t += dT;
         }
     }
+
 }
 
 [BurstCompile]
